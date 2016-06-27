@@ -1,0 +1,55 @@
+require 'opal'
+require 'opal-browser'
+require 'reactive-ruby'
+require 'uglifier'
+
+Opal::Processor.source_map_enabled = true
+
+desc "Build our app to build.js in development mode"
+task :development do
+  Opal.append_path "."
+  Opal.append_path ".."
+  Opal.append_path "../../app"
+  Opal.append_path "../../app/client"
+
+  #Opal.use_gem 'bull-autocomplete'
+  #Opal.use_gem 'bull-date-time-picker'
+  builder = Opal::Builder.new
+  #builder = Opal::Builder.new(:stubs => ['opal', 'reactive-ruby'])
+  build_js = builder.build("../../app/client/main.rb").to_s
+
+  #source_map = builder.source_map
+  #build_js << '//# sourceMappingURL=main.js.map'
+  #File.write(File.join('http', 'main.js.map'), source_map.to_s)
+  File.write(File.join('http', 'build.js'), build_js)
+
+end
+
+desc "build reactive-ruby"
+task :build_reactive_ruby do
+  Opal.append_path "."
+  File.binwrite "build_reactive_ruby.js", Opal::Builder.build("rr").to_s
+  File.binwrite "build_reactive_ruby_uglify.js", Uglifier.new.compile(File.read("build_reactive_ruby.js"))
+end
+
+desc "clean"
+task :clean do
+  File.delete File.join('http', 'build.css') if File.exist? File.join('http', 'build.css')
+  File.delete File.join('..', 'style', 'build.styl.css') if File.exist? File.join('..', 'style', 'build.styl.css')
+end
+
+desc "stylus compile"
+task :stylus => [:clean] do
+  files = Dir.glob(File.join("..", "style", "**", "*.styl")) + Dir.glob(File.join("..", "..", "app", "style", "**", "*.styl"))
+  dest = File.join('..', 'style', 'build.styl.css')
+  files.each do |f|
+    `stylus < #{f} >> #{dest}`
+  end
+end
+
+desc "concatenate css to build.css"
+task :css => [:stylus] do
+  files = Dir.glob(File.join("..", "style", "**", "*.css")).join(' ')
+  dest = File.join('http', 'build.css')
+  `cat #{files} > #{dest}` if files != ''
+end
