@@ -5,10 +5,10 @@ module MReport
     MReport.reports
   end
 
-  def self.load_reports
+  def self.load_reports path
     @reports = {}
-    #(Dir.glob(File.join('..', '..', 'app', 'reports' , '*.html'))+Dir.glob(File.join('reports' , '*.html'))).each do |file|
-    Dir.glob(File.join('..', '..', '**', 'reports' , '*.html')).each do |file|
+    #Dir.glob(File.join('..', '..', '**', 'reports' , '*.html')).each do |file|
+    Dir.glob(File.join(path, '**', 'reports' , '*.html')).each do |file|
       puts "load file #{file}"
       html = File.read(file)
       @reports[File.basename(file, '.html')] = Liquid::Template.parse(html)

@@ -73,7 +73,7 @@ class BullServerController
 
     def notify(msg)
         msg = JSON.parse msg
-        logger.info msg
+        #logger.info msg
         stdout_logger.info msg
         command = msg['command']
         kwargs = symbolize_keys(msg['kwargs'])
@@ -398,7 +398,7 @@ class BullServerController
                         self.send(command, *args, **kwargs)
                     end
                 rescue Exception => e
-                    logger.debug e
+                    #logger.debug e
                     stdout_logger.debug e
                 end
             end
@@ -415,7 +415,7 @@ class BullServerController
                 end
                 @ws.send({response: 'rpc', id: id, result: v, times: times(v)}.to_json)
               rescue Exception => e
-                  logger.debug e
+                  #logger.debug e
                   stdout_logger.debug e
               end
             end
@@ -432,7 +432,7 @@ class BullServerController
                     end
                     file_send id, predicate, keys
                 rescue Exception => e
-                    logger.debug e
+                    #logger.debug e
                     stdout_logger.debug e
                 end
             end
